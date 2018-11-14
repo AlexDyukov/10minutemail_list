@@ -1,2 +1,2 @@
-* * * * * cd ~/src/github.com/AlexDyukov/10minutemail_list/; /bin/bash 10minutemailnotify.sh
+* * * * * cd ~/src/github.com/AlexDyukov/10minutemail_list/; /bin/bash 10minutemail_notify_example.sh
 0 0 * * * sleep $[RANDOM\%360]m ; cd ~/src/github.com/AlexDyukov/10minutemail_list/; python3 10minutemail_grabber.py | sort > latest.list 2>~/10minutemail.error; git commit -am "update $(date)" --quiet && git push --quiet
