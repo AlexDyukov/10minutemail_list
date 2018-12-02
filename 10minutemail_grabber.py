@@ -27,13 +27,14 @@ def _get_driver():
 def get_body(url, class_name):
     wait_timeout = 10
 
-    # get page
     driver = _get_driver()
-    driver.get(url)
 
-    # wait for key element
-    sleep(1)
     try:
+        # get page
+        driver.get(url)
+
+        # wait for key element
+        sleep(1)
         WebDriverWait(driver, wait_timeout).until(lambda x: x.find_element_by_class_name(class_name))
     except TimeoutException:
         print('We got an error while processing {}'.format(url), file=stderr)
