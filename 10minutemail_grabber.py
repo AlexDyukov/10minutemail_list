@@ -5,8 +5,9 @@
 
 import re
 import tldextract
+import pickle
 from sys import stderr
-from time import sleep
+from time import sleep, time
 from random import randint
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -24,9 +25,7 @@ def _get_driver():
     return driver
 
 
-def get_body(url, class_name):
-    wait_timeout = 10
-
+def get_body(url, class_name, wait_timeout):
     driver = _get_driver()
 
     try:
@@ -88,7 +87,30 @@ def get_uniq_domains(list_of_domainsset):
     return result
 
 
+def update_state(domains, expire_time):
+    state = {}
+    state_file = 'state.dump'
+    try:
+        with open(state_file, 'rb') as f:
+            state = pickle.load(f)
+    except (IOError, EOFError):
+        pass
+
+    current_time = time()
+    for d in domains:
+        state[d] = current_time
+
+    state = {domain: time for (domain, time) in state.items() if current_time - time < expire_time}
+    with open(state_file, 'wb') as f:
+        pickle.dump(state, f)
+
+    return state.keys()
+
+
 def main():
+    wait_timeout = 10
+    expire_time = 2629800  # month
+
     # TODO: http://email-wegwerf.de/wegwerfemail-liste.html
     parse_list = [('https://dropmail.me/en/', 'email'),
                   ('https://10minutemail.net/', 'mailtext'),
@@ -102,7 +124,7 @@ def main():
     parsed_bad_domains = []
     for (url, key) in parse_list:
         # <head> doesn't have visible parts
-        body = get_body(url, key)
+        body = get_body(url, key, wait_timeout)
         domains_like = find_domains(body)
         parsed_bad_domains.append(domains_like)
 
@@ -116,6 +138,7 @@ def main():
                                'trashmail.de', 'mailcatch.com', 'mt2015.com'})
 
     bl_domains = get_uniq_domains(parsed_bad_domains)
+    bl_domains = update_state(bl_domains, expire_time)
     print('\n'.join(bl_domains))
 
 
