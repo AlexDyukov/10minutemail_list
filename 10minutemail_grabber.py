@@ -16,12 +16,10 @@ from selenium.common.exceptions import TimeoutException
 
 
 def _get_driver():
-    chromedriver_path = '/usr/lib/chromium-browser/chromedriver'
-
     chrome_options = Options()
     chrome_options.add_argument("--headless")
     chrome_options.add_argument("--window-size=1920x1080")
-    driver = webdriver.Chrome(chrome_options=chrome_options, executable_path=chromedriver_path)
+    driver = webdriver.Chrome(chrome_options=chrome_options)
     return driver
 
 
